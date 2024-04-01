@@ -7,7 +7,7 @@ using static Assignment_15.Order;
 
 namespace Assignment_15
 {
-    //I want to implement an Order class and remove the implementation of the List/Dictionary from the Subject class, and instead use the Order class to store the orders.
+    //I want to implement an Order class and remove the implementation of the List/Dictionary from the Subject class.
     public class Subject : ISubject
     {
         //Order List simplified , essential to both staff and customers (Observers)
