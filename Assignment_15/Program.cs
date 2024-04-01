@@ -5,11 +5,11 @@
 using Assignment_15;
 
 var subject = new Subject();
-var customer1 = new Customer();
+var customer1 = new Customer("Customer 1");
 subject.Attach(customer1);
 
-var staff1 = new Staff();
-var staff2 = new Staff();
+var staff1 = new Staff("Staff 1");
+var staff2 = new Staff("Staff 2");
 subject.Attach(staff1);
 subject.Attach(staff2);
 

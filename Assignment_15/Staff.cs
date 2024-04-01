@@ -8,12 +8,16 @@ namespace Assignment_15
 {
     class Staff : IObserver
     {
-        public void Update(ISubject subject)
+        public Staff(string v)
         {
-            if((subject as Subject).Orders.Count > 0)
-            {
-                Console.WriteLine("Staff : New order notification.");
-            }
+            this.Name = v;
+        }
+
+        public string Name { get; set; }
+
+        public void Update(ISubject subject)
+        { 
+            Console.WriteLine($"{this.Name} :  Order has changed status.");
         }
     }
 }

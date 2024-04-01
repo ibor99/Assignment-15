@@ -3,14 +3,16 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static Assignment_15.Order;
 
 namespace Assignment_15
 {
+    //I want to implement an Order class and remove the implementation of the List/Dictionary from the Subject class, and instead use the Order class to store the orders.
     public class Subject : ISubject
     {
         //Order List simplified , essential to both staff and customers (Observers)
-        public bool isNew = false;
-        public Dictionary<string,string> Orders { get; set; } = new Dictionary<string,string>();
+
+        private OrderRepository OrderRepository = new OrderRepository();
 
         private List<IObserver> _observers = new List<IObserver>();
 
@@ -33,11 +35,17 @@ namespace Assignment_15
         {
             Console.WriteLine("Subject : Notifying observers...");
 
-            foreach (var observer in this._observers) 
+            foreach (var observer in this._observers)
             {
                 observer.Update(this);
             }
-            isNew = false;
+            foreach (var order in this.OrderRepository.GetAllOrders())
+            {
+                if(order.Status == OrderStatus.New)
+                {
+                    order.Status = OrderStatus.Processing;
+                }
+            }
         }
 
 
@@ -48,26 +56,26 @@ namespace Assignment_15
         public void PlaceOrder(IObserver observer, string orderName)
         {
             Console.WriteLine($"{nameof(observer)} placed an order.");
-            this.Orders.Add($"{orderName}","Pending");
-            isNew = true;
+            this.OrderRepository.AddOrder(new Order(orderName,OrderStatus.New));
 
             Thread.Sleep(10);
 
-            Console.WriteLine($"Subject : A new Order has been placed : {this.Orders.Last()}");
+            Console.WriteLine($"Subject : A new Order has been placed : {this.OrderRepository.GetOrder(orderName).Name}");
             this.Notify();
         }
 
         public void FulfillOrder(IObserver observer, string orderName)
         {
-            if (observer is Staff && this.Orders[orderName] == "Ready to Ship")
+            var order = this.OrderRepository.GetOrder(orderName);
+            if (observer is Staff && order != null && order.Status == OrderStatus.Shipped)
             {
                 Console.WriteLine($"{nameof(observer)} fullfilled an order.");
-                var toRemove = $"[{orderName}, Fullfilled]";
-                this.Orders.Remove(orderName);
+                order.Status = OrderStatus.Delivered;
+                this.OrderRepository.RemoveOrder(order);
 
                 Thread.Sleep(10);
 
-                Console.WriteLine($"Subject : An order has been fullfilled and removed (next in queue) : {toRemove}");
+                Console.WriteLine($"Subject : An order has been fullfilled and removed (next in queue) : {order.Name}");
                 this.Notify();
             }
 
@@ -75,18 +83,16 @@ namespace Assignment_15
 
         public void ReadyToShip(IObserver observer, string orderName)
         {
-            if(observer is Staff) 
+            var order = this.OrderRepository.GetOrder(orderName);
+            if(observer is Staff && order != null && order.Status == OrderStatus.Processing) 
             {
                 Console.WriteLine($"{nameof(observer)} prepared an order for shipping");
-
-                if (this.Orders.ContainsKey(orderName))
-                {
-                    this.Orders[orderName] = "Ready to Ship";
-                }
+                order.Status = OrderStatus.Shipped;
 
                 Thread.Sleep(10);
 
-                Console.WriteLine($"Subject : An order has been made ready to ship : [{orderName}, {this.Orders[orderName]}]");
+                Console.WriteLine($"Subject : An order has been made ready to ship : {order.Name}");
+                this.Notify();
             }
         }
 

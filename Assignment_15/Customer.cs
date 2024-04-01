@@ -8,12 +8,14 @@ namespace Assignment_15
 {
     class Customer : IObserver
     {
+        public Customer(string v)
+        {
+            this.Name = v;
+        }
+        public string Name { get; set; }
         public void Update(ISubject subject)
         {
-            if((subject as Subject).isNew == true) 
-            {
-                Console.WriteLine("Customer :  Sent a notification to Customer.");
-            }
+            Console.WriteLine($"{this.Name} :  Sent a notification to Customer.");
         }
     }
 }
